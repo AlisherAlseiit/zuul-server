@@ -2,6 +2,7 @@ package com.example.zuulserv.security;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.example.zuulserv.filters.JwtTokenAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -13,15 +14,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity 	// Enable security config. This annotation denotes config for spring security.
 public class SecurityTokenConfig extends WebSecurityConfigurerAdapter {
+
+	@Autowired
+	private JwtConfig jwtConfig;
 	@Override
   	protected void configure(HttpSecurity http) throws Exception {
     	   http
 		.csrf().disable()
-		    // make sure we use stateless session; session won't be used to store user's state.
-	 	    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				   .authorizeRequests()
+				   .antMatchers("/auth/**").permitAll()
+				   .antMatchers("/api/ratings/**").hasAuthority("company")
+				   .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
 		    // handle an authorized attempts
-		    .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED));
+		    .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+		   .and().addFilterAfter(new JwtTokenAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class);;
 	}
 
+	@Bean
+	public JwtConfig jwtConfig() {
+		return new JwtConfig();
+	}
 }
