@@ -48,6 +48,8 @@ public class JwtTokenAuthenticationFilter extends  OncePerRequestFilter {
 
 		try {	// exceptions might be thrown in creating the claims if for example the token is expired
 
+			System.out.println(token);
+			System.out.println(jwtConfig.toString());
 			// 4. Validate the token
 			Claims claims = Jwts.parser()
 					.setSigningKey(jwtConfig.getSecret().getBytes())
