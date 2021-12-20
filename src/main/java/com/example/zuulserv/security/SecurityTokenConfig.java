@@ -42,6 +42,7 @@ public class SecurityTokenConfig extends WebSecurityConfigurerAdapter {
 				   .antMatchers(AUTH_WHITELIST).permitAll()
 				   .antMatchers(HttpMethod.POST, "/auth/**").permitAll()
 				   .antMatchers("/ratings/**").permitAll()
+				   .antMatchers("/news/**").permitAll()
 				   .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
 		    // handle an authorized attempts
